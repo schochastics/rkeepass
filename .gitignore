@@ -1,0 +1,8 @@
+.Rproj.user
+R/parse3.R
+R/read3.R
+.Rhistory
+.Rdata
+.httr-oauth
+.DS_Store
+.quarto
