@@ -1,4 +1,11 @@
 ^rkeepass\.Rproj$
 ^\.Rproj\.user$
-R/parse3.R
-R/read3.R
+^src/\.cargo$
+^src/rust/vendor$
+^src/Makevars$
+^src/Makevars\.win$
+^data-raw$
+^LICENSE\.md$
+^\.claude$
+^rkeepass_.*\.tar\.gz$
+^rkeepass\.Rcheck$

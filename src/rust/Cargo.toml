@@ -1,0 +1,13 @@
+[package]
+name = 'rkeepass'
+publish = false
+version = '0.1.0'
+edition = '2021'
+
+[lib]
+crate-type = ['staticlib']
+name = 'rkeepass'
+
+[dependencies]
+extendr-api = '0.7'
+keepass = '0.7'

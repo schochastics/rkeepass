@@ -1,8 +1,14 @@
 .Rproj.user
-R/parse3.R
-R/read3.R
 .Rhistory
 .Rdata
 .httr-oauth
 .DS_Store
 .quarto
+src/*.o
+src/*.so
+src/*.dll
+src/rust/target
+src/.cargo
+src/Makevars
+src/Makevars.win
+.claude
