@@ -7,5 +7,7 @@
 ^data-raw$
 ^LICENSE\.md$
 ^\.claude$
+^\.github$
+^README\.Rmd$
 ^rkeepass_.*\.tar\.gz$
 ^rkeepass\.Rcheck$
