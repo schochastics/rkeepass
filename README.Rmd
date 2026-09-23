@@ -50,7 +50,14 @@ db <- kdbx_read(
 db
 ```
 
-The result is a plain data.frame. Each row is one entry, and the `group_path` column preserves the folder structure of the database.
+The result is a data.frame with one row per entry, and the `group_path` column preserves the folder structure of the database.
+Passwords are masked when printing, but the `password` column holds the decrypted values:
+
+```{r}
+db$password[db$title == "GitHub"]
+
+print(db, reveal = TRUE)
+```
 
 ```{r}
 # filter by group

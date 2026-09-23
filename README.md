@@ -45,6 +45,28 @@ db
 #> 2 0327251b-228f-4a09-8d82-f32d1c0f294b Root/Internet        GitHub
 #> 3 6fb55b5d-a9cb-4ca0-8f5e-e1e31823bc58 Root/Internet StackOverflow
 #> 4 911c251d-a49d-472b-b409-b75f5b25408c  Root/Banking        MyBank
+#>           username password                        url                 notes
+#> 1 user@example.com ********   https://mail.example.com      My email account
+#> 2          devuser ********         https://github.com                  <NA>
+#> 3          coder42 ********  https://stackoverflow.com       Programming Q&A
+#> 4         john_doe ******** https://mybank.example.com Main checking account
+```
+
+The result is a data.frame with one row per entry, and the `group_path`
+column preserves the folder structure of the database. Passwords are
+masked when printing, but the `password` column holds the decrypted
+values:
+
+``` r
+db$password[db$title == "GitHub"]
+#> [1] "ghpass456"
+
+print(db, reveal = TRUE)
+#>                                   uuid    group_path         title
+#> 1 a726a6c6-ab09-42d3-b4dc-cb3d8bfc6767          Root         Email
+#> 2 0327251b-228f-4a09-8d82-f32d1c0f294b Root/Internet        GitHub
+#> 3 6fb55b5d-a9cb-4ca0-8f5e-e1e31823bc58 Root/Internet StackOverflow
+#> 4 911c251d-a49d-472b-b409-b75f5b25408c  Root/Banking        MyBank
 #>           username     password                        url
 #> 1 user@example.com emailpass123   https://mail.example.com
 #> 2          devuser    ghpass456         https://github.com
@@ -52,13 +74,10 @@ db
 #> 4         john_doe  bankpass000 https://mybank.example.com
 #>                   notes
 #> 1      My email account
-#> 2                      
+#> 2                  <NA>
 #> 3       Programming Q&A
 #> 4 Main checking account
 ```
-
-The result is a plain data.frame. Each row is one entry, and the
-`group_path` column preserves the folder structure of the database.
 
 ``` r
 # filter by group
@@ -66,9 +85,9 @@ db[db$group_path == "Root/Internet", ]
 #>                                   uuid    group_path         title username
 #> 2 0327251b-228f-4a09-8d82-f32d1c0f294b Root/Internet        GitHub  devuser
 #> 3 6fb55b5d-a9cb-4ca0-8f5e-e1e31823bc58 Root/Internet StackOverflow  coder42
-#>    password                       url           notes
-#> 2 ghpass456        https://github.com                
-#> 3 sopass789 https://stackoverflow.com Programming Q&A
+#>   password                       url           notes
+#> 2 ********        https://github.com            <NA>
+#> 3 ******** https://stackoverflow.com Programming Q&A
 ```
 
 Key files can be used instead of (or in addition to) a password:

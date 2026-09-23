@@ -113,3 +113,30 @@ test_that("kdbx_read validates argument types", {
   expect_error(kdbx_read(example_kdbx(), password = NA_character_), "`password` must be a single string")
   expect_error(kdbx_read(example_kdbx(), keyfile = TRUE), "`keyfile` must be a single string")
 })
+
+test_that("kdbx_read returns a kdbx_entries object", {
+  result <- kdbx_read(example_kdbx(), password = "test123")
+
+  expect_s3_class(result, c("kdbx_entries", "data.frame"), exact = TRUE)
+  expect_s3_class(result[1:2, ], "kdbx_entries")
+})
+
+test_that("printing masks passwords unless reveal = TRUE", {
+  result <- kdbx_read(example_kdbx(), password = "test123")
+
+  masked <- capture.output(print(result))
+  expect_false(any(grepl("emailpass123", masked)))
+  expect_true(any(grepl("********", masked, fixed = TRUE)))
+
+  revealed <- capture.output(print(result, reveal = TRUE))
+  expect_true(any(grepl("emailpass123", revealed)))
+
+  expect_invisible(print(result))
+  expect_identical(withVisible(print(result))$value, result)
+  expect_snapshot(result[, c("title", "username", "password")])
+})
+
+test_that("printing works when the password column is dropped", {
+  result <- kdbx_read(example_kdbx(), password = "test123")
+  expect_no_error(capture.output(print(result[, c("title", "url")])))
+})

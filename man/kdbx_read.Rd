@@ -14,7 +14,8 @@ kdbx_read(path, password = NULL, keyfile = NULL)
 \item{keyfile}{Character scalar or \code{NULL}. Path to a key file.}
 }
 \value{
-A data.frame with one row per entry and columns:
+A data.frame of class \code{kdbx_entries} with one row per entry and
+columns:
 \describe{
 \item{uuid}{Character. The unique identifier of the entry.}
 \item{group_path}{Character. The slash-separated path of the group
@@ -25,6 +26,10 @@ containing this entry (e.g., \code{"Root/Internet"}).}
 \item{url}{Character. The URL field.}
 \item{notes}{Character. The notes field.}
 }
+
+Passwords are masked when the result is printed (see
+\code{\link[=print.kdbx_entries]{print.kdbx_entries()}}) but are stored in plain text in the \code{password}
+column.
 }
 \description{
 Reads entries from a KeePass \code{.kdbx} database file (versions 3.x and 4.x).

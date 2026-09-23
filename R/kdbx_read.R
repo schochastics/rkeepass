@@ -12,7 +12,8 @@
 #' Protected fields (like passwords) are automatically decrypted.
 #' Fields that are empty or not set in the database are returned as `NA`.
 #'
-#' @return A data.frame with one row per entry and columns:
+#' @return A data.frame of class `kdbx_entries` with one row per entry and
+#'   columns:
 #'   \describe{
 #'     \item{uuid}{Character. The unique identifier of the entry.}
 #'     \item{group_path}{Character. The slash-separated path of the group
@@ -23,6 +24,10 @@
 #'     \item{url}{Character. The URL field.}
 #'     \item{notes}{Character. The notes field.}
 #'   }
+#'
+#'   Passwords are masked when the result is printed (see
+#'   [print.kdbx_entries()]) but are stored in plain text in the `password`
+#'   column.
 #'
 #' @export
 #' @examples
@@ -48,5 +53,36 @@ kdbx_read <- function(path, password = NULL, keyfile = NULL) {
     stop(res$err, call. = FALSE)
   }
 
-  data.frame(res$ok)
+  new_kdbx_entries(data.frame(res$ok))
+}
+
+new_kdbx_entries <- function(x) {
+  class(x) <- c("kdbx_entries", class(x))
+  x
+}
+
+#' Print KeePass entries
+#'
+#' Prints the entries returned by [kdbx_read()] with the `password` column
+#' masked, so that passwords do not end up in the console or in logs.
+#'
+#' @param x A `kdbx_entries` object.
+#' @param ... Passed on to [print.data.frame()].
+#' @param reveal Logical. If `TRUE`, passwords are printed in plain text.
+#'
+#' @return `x`, invisibly.
+#' @export
+#' @examples
+#' path <- system.file("extdata", "example.kdbx", package = "rkeepass")
+#' db <- kdbx_read(path, password = "test123")
+#' db
+#' print(db, reveal = TRUE)
+print.kdbx_entries <- function(x, ..., reveal = FALSE) {
+  out <- x
+  class(out) <- setdiff(class(out), "kdbx_entries")
+  if (!isTRUE(reveal) && "password" %in% names(out)) {
+    out$password[!is.na(out$password)] <- "********"
+  }
+  print(out, ...)
+  invisible(x)
 }
