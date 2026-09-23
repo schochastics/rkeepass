@@ -104,9 +104,9 @@ fn read_database(
     Ok(entries.into_list())
 }
 
-/// Returns `list(ok = <entries>, err = NULL)` on success and
-/// `list(ok = NULL, err = <message>)` on failure, so that the error can be
-/// raised on the R side without unwinding through Rust.
+// Returns `list(ok = <entries>, err = NULL)` on success and
+// `list(ok = NULL, err = <message>)` on failure, so that the error can be
+// raised on the R side without unwinding through Rust.
 #[extendr]
 fn kdbx_read_impl(path: &str, password: Nullable<String>, keyfile: Nullable<String>) -> List {
     match read_database(path, password, keyfile) {

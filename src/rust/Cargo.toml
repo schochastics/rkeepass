@@ -6,9 +6,17 @@ edition = '2021'
 rust-version = '1.85'
 
 [lib]
-crate-type = ['staticlib']
+crate-type = ['rlib', 'staticlib']
 name = 'rkeepass'
 
+[[bin]]
+name = 'document'
+path = 'document.rs'
+
 [dependencies]
-extendr-api = '0.7'
+extendr-api = '0.9'
 keepass = '0.7'
+
+[profile.release]
+lto = true
+codegen-units = 1
