@@ -40,7 +40,10 @@ kdbx_read <- function(path, password = NULL, keyfile = NULL) {
     keyfile <- normalizePath(keyfile, mustWork = TRUE)
   }
 
-  cols <- kdbx_read_impl(path, password, keyfile)
+  res <- kdbx_read_impl(path, password, keyfile)
+  if (!is.null(res$err)) {
+    stop(res$err, call. = FALSE)
+  }
 
-  data.frame(cols, stringsAsFactors = FALSE)
+  data.frame(res$ok, stringsAsFactors = FALSE)
 }

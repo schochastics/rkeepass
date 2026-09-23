@@ -1,51 +1,84 @@
 use extendr_api::prelude::*;
+use keepass::db::{Entry, Group};
+use keepass::error::{DatabaseKeyError, DatabaseOpenError};
 use keepass::{Database, DatabaseKey};
 use std::fs::File;
 
-fn collect_entries(
-    group: &keepass::db::Group,
-    parent_path: &str,
-    uuids: &mut Vec<String>,
-    group_paths: &mut Vec<String>,
-    titles: &mut Vec<String>,
-    usernames: &mut Vec<String>,
-    passwords: &mut Vec<String>,
-    urls: &mut Vec<String>,
-    notes: &mut Vec<String>,
-) {
-    let current_path = if parent_path.is_empty() {
-        group.name.clone()
-    } else {
-        format!("{}/{}", parent_path, group.name)
-    };
+/// Column-wise storage of all entries in a database.
+#[derive(Default)]
+struct Entries {
+    uuid: Vec<String>,
+    group_path: Vec<String>,
+    title: Vec<String>,
+    username: Vec<String>,
+    password: Vec<String>,
+    url: Vec<String>,
+    notes: Vec<String>,
+}
 
-    for entry in group.entries() {
-        uuids.push(entry.uuid.to_string());
-        group_paths.push(current_path.clone());
-        titles.push(entry.get_title().unwrap_or("").to_string());
-        usernames.push(entry.get_username().unwrap_or("").to_string());
-        passwords.push(entry.get_password().unwrap_or("").to_string());
-        urls.push(entry.get_url().unwrap_or("").to_string());
-        notes.push(entry.get("Notes").unwrap_or("").to_string());
+impl Entries {
+    fn push(&mut self, entry: &Entry, group_path: &str) {
+        let field = |value: Option<&str>| value.unwrap_or("").to_string();
+
+        self.uuid.push(entry.uuid.to_string());
+        self.group_path.push(group_path.to_string());
+        self.title.push(field(entry.get_title()));
+        self.username.push(field(entry.get_username()));
+        self.password.push(field(entry.get_password()));
+        self.url.push(field(entry.get_url()));
+        self.notes.push(field(entry.get("Notes")));
     }
 
-    for child_group in group.groups() {
-        collect_entries(
-            child_group,
-            &current_path,
-            uuids,
-            group_paths,
-            titles,
-            usernames,
-            passwords,
-            urls,
-            notes,
-        );
+    /// Recursively collect the entries of `group` and all of its subgroups.
+    fn collect(&mut self, group: &Group, parent_path: &str) {
+        let path = if parent_path.is_empty() {
+            group.name.clone()
+        } else {
+            format!("{}/{}", parent_path, group.name)
+        };
+
+        for entry in group.entries() {
+            self.push(entry, &path);
+        }
+
+        for child in group.groups() {
+            self.collect(child, &path);
+        }
+    }
+
+    fn into_list(self) -> List {
+        list!(
+            uuid = self.uuid,
+            group_path = self.group_path,
+            title = self.title,
+            username = self.username,
+            password = self.password,
+            url = self.url,
+            notes = self.notes
+        )
     }
 }
 
-#[extendr]
-fn kdbx_read_impl(path: &str, password: Nullable<String>, keyfile: Nullable<String>) -> List {
+fn open_error_message(err: DatabaseOpenError) -> String {
+    match err {
+        DatabaseOpenError::Key(DatabaseKeyError::IncorrectKey) => {
+            "Incorrect password or keyfile.".to_string()
+        }
+        DatabaseOpenError::UnsupportedVersion => {
+            "Unsupported KeePass database version.".to_string()
+        }
+        DatabaseOpenError::DatabaseIntegrity(e) => {
+            format!("Not a valid KeePass database: {}", e)
+        }
+        e => format!("Failed to open database: {}", e),
+    }
+}
+
+fn read_database(
+    path: &str,
+    password: Nullable<String>,
+    keyfile: Nullable<String>,
+) -> std::result::Result<List, String> {
     let mut key = DatabaseKey::new();
 
     if let NotNull(ref pw) = password {
@@ -53,48 +86,32 @@ fn kdbx_read_impl(path: &str, password: Nullable<String>, keyfile: Nullable<Stri
     }
 
     if let NotNull(ref kf_path) = keyfile {
-        let mut kf_file = File::open(kf_path)
-            .unwrap_or_else(|e| panic!("Cannot open keyfile '{}': {}", kf_path, e));
+        let mut kf_file =
+            File::open(kf_path).map_err(|e| format!("Cannot open keyfile '{}': {}", kf_path, e))?;
         key = key
             .with_keyfile(&mut kf_file)
-            .unwrap_or_else(|e| panic!("Cannot read keyfile '{}': {}", kf_path, e));
+            .map_err(|e| format!("Cannot read keyfile '{}': {}", kf_path, e))?;
     }
 
-    let mut file = File::open(path)
-        .unwrap_or_else(|e| panic!("Cannot open file '{}': {}", path, e));
+    let mut file = File::open(path).map_err(|e| format!("Cannot open file '{}': {}", path, e))?;
 
-    let db = Database::open(&mut file, key)
-        .unwrap_or_else(|e| panic!("Failed to open database: {}", e));
+    let db = Database::open(&mut file, key).map_err(open_error_message)?;
 
-    let mut uuids = Vec::new();
-    let mut group_paths = Vec::new();
-    let mut titles = Vec::new();
-    let mut usernames = Vec::new();
-    let mut passwords = Vec::new();
-    let mut urls = Vec::new();
-    let mut notes = Vec::new();
+    let mut entries = Entries::default();
+    entries.collect(&db.root, "");
 
-    collect_entries(
-        &db.root,
-        "",
-        &mut uuids,
-        &mut group_paths,
-        &mut titles,
-        &mut usernames,
-        &mut passwords,
-        &mut urls,
-        &mut notes,
-    );
+    Ok(entries.into_list())
+}
 
-    list!(
-        uuid = uuids,
-        group_path = group_paths,
-        title = titles,
-        username = usernames,
-        password = passwords,
-        url = urls,
-        notes = notes
-    )
+/// Returns `list(ok = <entries>, err = NULL)` on success and
+/// `list(ok = NULL, err = <message>)` on failure, so that the error can be
+/// raised on the R side without unwinding through Rust.
+#[extendr]
+fn kdbx_read_impl(path: &str, password: Nullable<String>, keyfile: Nullable<String>) -> List {
+    match read_database(path, password, keyfile) {
+        Ok(entries) => list!(ok = entries, err = NULL),
+        Err(msg) => list!(ok = NULL, err = msg),
+    }
 }
 
 extendr_module! {
