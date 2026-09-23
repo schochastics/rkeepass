@@ -13,3 +13,4 @@
 ^rkeepass\.Rcheck$
 ^src/rust/target$
 ^cran-comments\.md$
+^src/vendor$
