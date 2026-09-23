@@ -34,8 +34,8 @@ $(STATLIB):
 	export PATH="$(PATH):$(HOME)/.cargo/bin" && \
 	RUSTFLAGS="$(RUSTFLAGS) --print=native-static-libs" cargo build @CRAN_FLAGS@ --lib --release --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR)
 
-	# Always clean up CARGOTMP
-	rm -Rf $(CARGOTMP);
+	# Always clean up CARGOTMP and the unpacked vendor directory
+	rm -Rf $(CARGOTMP) $(VENDOR_DIR);
 
 C_clean:
 	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS)

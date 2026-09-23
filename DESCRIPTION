@@ -8,12 +8,14 @@ Description: Read entries from KeePass '.kdbx' database files (versions 3.x
     and 4.x) using the 'keepass-rs' Rust library. Supports password and
     keyfile authentication.
 License: MIT + file LICENSE
+URL: https://github.com/schochastics/rkeepass
+BugReports: https://github.com/schochastics/rkeepass/issues
 Depends:
     R (>= 4.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Config/rextendr/version: 0.5.0
-SystemRequirements: Cargo (Rust's package manager), rustc >= 1.67
+SystemRequirements: Cargo (Rust's package manager), rustc >= 1.85
 Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

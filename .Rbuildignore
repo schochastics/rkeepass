@@ -11,3 +11,5 @@
 ^README\.Rmd$
 ^rkeepass_.*\.tar\.gz$
 ^rkeepass\.Rcheck$
+^src/rust/target$
+^cran-comments\.md$

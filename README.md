@@ -26,7 +26,7 @@ pak::pak("schochastics/rkeepass")
 ### System requirements
 
 You need a working [Rust](https://www.rust-lang.org/tools/install)
-toolchain (rustc \>= 1.67).
+toolchain (rustc \>= 1.85).
 
 ## Example
 

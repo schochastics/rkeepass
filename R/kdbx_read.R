@@ -17,7 +17,9 @@
 #'   \describe{
 #'     \item{uuid}{Character. The unique identifier of the entry.}
 #'     \item{group_path}{Character. The slash-separated path of the group
-#'       containing this entry (e.g., `"Root/Internet"`).}
+#'       containing this entry (e.g., `"Root/Internet"`). The first component
+#'       is the name of the database's root group, which is `"Root"` by
+#'       default but can be renamed in KeePass.}
 #'     \item{title}{Character. The entry title.}
 #'     \item{username}{Character. The username field.}
 #'     \item{password}{Character. The password field (decrypted).}

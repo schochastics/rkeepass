@@ -8,6 +8,14 @@
 \description{
 Read entries from KeePass '.kdbx' database files (versions 3.x and 4.x) using the 'keepass-rs' Rust library. Supports password and keyfile authentication.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/schochastics/rkeepass}
+  \item Report bugs at \url{https://github.com/schochastics/rkeepass/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: David Schoch \email{david@schochastics.net} (\href{https://orcid.org/0000-0003-2952-4812}{ORCID})
 
