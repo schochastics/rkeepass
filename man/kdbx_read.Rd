@@ -33,6 +33,7 @@ Reads entries from a KeePass \code{.kdbx} database file (versions 3.x and 4.x).
 At least one of \code{password} or \code{keyfile} must be provided.
 The function auto-detects the KDBX version (3.x or 4.x).
 Protected fields (like passwords) are automatically decrypted.
+Fields that are empty or not set in the database are returned as \code{NA}.
 }
 \examples{
 path <- system.file("extdata", "example.kdbx", package = "rkeepass")

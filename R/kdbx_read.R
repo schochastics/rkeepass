@@ -10,6 +10,7 @@
 #' At least one of `password` or `keyfile` must be provided.
 #' The function auto-detects the KDBX version (3.x or 4.x).
 #' Protected fields (like passwords) are automatically decrypted.
+#' Fields that are empty or not set in the database are returned as `NA`.
 #'
 #' @return A data.frame with one row per entry and columns:
 #'   \describe{

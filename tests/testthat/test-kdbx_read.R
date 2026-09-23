@@ -29,13 +29,25 @@ test_that("kdbx_read preserves group hierarchy", {
   expect_equal(result$group_path[result$title == "MyBank"], "Root/Banking")
 })
 
+test_that("kdbx_read returns NA for empty fields", {
+  result <- kdbx_read(example_kdbx(), password = "test123")
+  expect_true(is.na(result$notes[result$title == "GitHub"]))
+
+  result <- kdbx_read(fixture("kdbx3_password.kdbx"), password = "demopass")
+  empty <- result[result$uuid == "222dd179-cb64-44c8-a7f6-cd0bc7731816", ]
+  expect_true(is.na(empty$title))
+  expect_true(is.na(empty$username))
+  expect_true(is.na(empty$password))
+  expect_equal(empty$notes, "This entry has an empty title, username, and password")
+})
+
 test_that("kdbx_read reads KDBX 3.x databases", {
   result <- kdbx_read(fixture("kdbx3_password.kdbx"), password = "demopass")
 
   expect_equal(nrow(result), 6)
   expect_true("sample/General/Subgroup" %in% result$group_path)
   expect_equal(
-    result$password[result$title == "test entry"],
+    result$password[which(result$title == "test entry")],
     "nWuu5AtqsxqNhnYgLwoB"
   )
 })

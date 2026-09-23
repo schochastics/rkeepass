@@ -9,16 +9,17 @@ use std::fs::File;
 struct Entries {
     uuid: Vec<String>,
     group_path: Vec<String>,
-    title: Vec<String>,
-    username: Vec<String>,
-    password: Vec<String>,
-    url: Vec<String>,
-    notes: Vec<String>,
+    title: Vec<Option<String>>,
+    username: Vec<Option<String>>,
+    password: Vec<Option<String>>,
+    url: Vec<Option<String>>,
+    notes: Vec<Option<String>>,
 }
 
 impl Entries {
     fn push(&mut self, entry: &Entry, group_path: &str) {
-        let field = |value: Option<&str>| value.unwrap_or("").to_string();
+        // Fields that are absent from the entry become NA in R.
+        let field = |value: Option<&str>| value.map(str::to_string);
 
         self.uuid.push(entry.uuid.to_string());
         self.group_path.push(group_path.to_string());

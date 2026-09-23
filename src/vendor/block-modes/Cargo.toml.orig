@@ -1,0 +1,10 @@
+[package]
+name = "block-modes"
+version = "0.9.1"
+description = "This crate is deprecated. Use crates from https://github.com/RustCrypto/block-modes instead."
+authors = ["RustCrypto Developers"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+edition = "2021"
+rust-version = "1.56"
+documentation = "https://docs.rs/block-modes"
