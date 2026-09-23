@@ -35,8 +35,7 @@ The function auto-detects the KDBX version (3.x or 4.x).
 Protected fields (like passwords) are automatically decrypted.
 }
 \examples{
-\dontrun{
-db <- kdbx_read("my_database.kdbx", password = "secret")
-db[db$group_path == "Root/Email", ]
-}
+path <- system.file("extdata", "example.kdbx", package = "rkeepass")
+db <- kdbx_read(path, password = "test123")
+db[db$group_path == "Root/Internet", ]
 }

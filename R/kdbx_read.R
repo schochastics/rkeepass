@@ -25,19 +25,21 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{
-#' db <- kdbx_read("my_database.kdbx", password = "secret")
-#' db[db$group_path == "Root/Email", ]
-#' }
+#' path <- system.file("extdata", "example.kdbx", package = "rkeepass")
+#' db <- kdbx_read(path, password = "test123")
+#' db[db$group_path == "Root/Internet", ]
 kdbx_read <- function(path, password = NULL, keyfile = NULL) {
-  path <- normalizePath(path, mustWork = TRUE)
+  check_string(path, "path")
+  check_string(password, "password", allow_null = TRUE)
+  check_string(keyfile, "keyfile", allow_null = TRUE)
 
   if (is.null(password) && is.null(keyfile)) {
-    stop("At least one of `password` or `keyfile` must be provided.")
+    stop("At least one of `password` or `keyfile` must be provided.", call. = FALSE)
   }
 
+  path <- check_file(path, "path")
   if (!is.null(keyfile)) {
-    keyfile <- normalizePath(keyfile, mustWork = TRUE)
+    keyfile <- check_file(keyfile, "keyfile")
   }
 
   res <- kdbx_read_impl(path, password, keyfile)
@@ -45,5 +47,5 @@ kdbx_read <- function(path, password = NULL, keyfile = NULL) {
     stop(res$err, call. = FALSE)
   }
 
-  data.frame(res$ok, stringsAsFactors = FALSE)
+  data.frame(res$ok)
 }

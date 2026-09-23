@@ -11,5 +11,10 @@ Read entries from KeePass '.kdbx' database files (versions 3.x and 4.x) using th
 \author{
 \strong{Maintainer}: David Schoch \email{david@schochastics.net} (\href{https://orcid.org/0000-0003-2952-4812}{ORCID})
 
+Authors:
+\itemize{
+  \item David Schoch \email{david@schochastics.net} (\href{https://orcid.org/0000-0003-2952-4812}{ORCID})
+}
+
 }
 \keyword{internal}
